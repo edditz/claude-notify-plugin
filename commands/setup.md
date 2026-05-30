@@ -6,6 +6,51 @@ Setup command for claude-notify-plugin. Guides users through configuring ntfy no
 
 You are helping the user set up push notifications for Claude Code via ntfy. Follow these steps:
 
+### Step 0: Check for existing configuration
+
+First, check if a configuration file already exists:
+
+```bash
+cat ~/.claude/plugins/claude-notify-plugin/config 2>/dev/null || echo "CONFIG_NOT_FOUND"
+```
+
+If configuration exists, show it to the user:
+
+```
+📋 检测到现有配置
+
+当前配置:
+- 通知频道: <NTFY_TOPIC>
+- 服务器: <NTFY_HOST>
+- 通知状态: <NTFY_ENABLED>
+- 终端检查: <NTFY_TERMINAL_CHECK>
+
+请选择:
+1. 使用现有配置 (推荐)
+2. 重新配置 (覆盖现有配置)
+
+请输入选项 (1-2):
+```
+
+**If user chooses 1 (Use existing configuration):**
+
+```
+✅ 使用现有配置
+
+配置详情:
+- 通知频道: <NTFY_TOPIC>
+- 服务器: <NTFY_HOST>
+- 配置文件: ~/.claude/plugins/claude-notify-plugin/config
+
+测试现有配置...
+```
+
+Then skip to Step 6 (Send test notification).
+
+**If user chooses 2 (Reconfigure):**
+
+Continue to Step 1.
+
 ### Step 1: Check ntfy CLI installation
 
 First, check if ntfy CLI is installed:
@@ -144,13 +189,32 @@ Send a test notification to verify the setup:
 **If using ntfy CLI:**
 ```bash
 source ~/.claude/plugins/claude-notify-plugin/config
-ntfy publish --title "claude-notify-plugin 测试" --priority 3 --quiet -m "通知配置成功！" "$NTFY_TOPIC"
+ntfy publish --config <(echo -e "default-host: $NTFY_HOST\ntoken: $NTFY_TOKEN") --title "claude-notify-plugin 测试" --priority 3 --quiet -m "通知配置成功！" "$NTFY_TOPIC"
 ```
 
 **If using curl:**
 ```bash
 source ~/.claude/plugins/claude-notify-plugin/config
-curl -H "Title: claude-notify-plugin 测试" -H "Priority: default" -d "通知配置成功！" "$NTFY_HOST/$NTFY_TOPIC"
+curl -H "Title: claude-notify-plugin 测试" -H "Priority: default" -H "Authorization: Bearer $NTFY_TOKEN" -d "通知配置成功！" "$NTFY_HOST/$NTFY_TOPIC"
+```
+
+**If using existing configuration:**
+
+Show the test result:
+```
+✅ 测试通知已发送！
+
+配置详情:
+- 通知频道: <NTFY_TOPIC>
+- 服务器: <NTFY_HOST>
+
+订阅方式:
+1. 手机安装 ntfy app (iOS/Android)
+2. 添加频道: <NTFY_TOPIC>
+3. 配置服务器: <NTFY_HOST>
+4. 完成！
+
+测试通知已发送，请检查手机是否收到。
 ```
 
 Note: If using public ntfy.sh server, the URL is `https://ntfy.sh/$NTFY_TOPIC`
