@@ -14,16 +14,54 @@ First, check if a configuration file already exists:
 cat ~/.claude/plugins/claude-notify-plugin/config 2>/dev/null || echo "CONFIG_NOT_FOUND"
 ```
 
-If configuration exists, show it to the user:
+If configuration exists, also check ntfy CLI configuration:
+
+```bash
+# Check ntfy CLI config
+cat ~/.config/ntfy/client.yml 2>/dev/null || echo "NTFY_CLI_CONFIG_NOT_FOUND"
+```
+
+Compare the two configurations and show to the user:
 
 ```
 📋 检测到现有配置
 
-当前配置:
+插件配置:
 - 通知频道: <NTFY_TOPIC>
 - 服务器: <NTFY_HOST>
 - 通知状态: <NTFY_ENABLED>
 - 终端检查: <NTFY_TERMINAL_CHECK>
+
+ntfy CLI 配置:
+- 服务器: <ntfy-cli-default-host> 或 "未配置"
+
+⚠️ 配置不一致！
+插件配置的服务器与 ntfy CLI 配置的服务器不同。
+建议更新 ntfy CLI 配置以保持一致。
+
+请选择:
+1. 使用现有配置并更新 ntfy CLI 配置 (推荐)
+2. 使用现有配置（不更新 ntfy CLI）
+3. 重新配置 (覆盖现有配置)
+
+请输入选项 (1-3):
+```
+
+**If configurations are consistent:**
+
+```
+📋 检测到现有配置
+
+插件配置:
+- 通知频道: <NTFY_TOPIC>
+- 服务器: <NTFY_HOST>
+- 通知状态: <NTFY_ENABLED>
+- 终端检查: <NTFY_TERMINAL_CHECK>
+
+ntfy CLI 配置:
+- 服务器: <ntfy-cli-default-host>
+
+✅ 配置一致
 
 请选择:
 1. 使用现有配置 (推荐)
@@ -32,7 +70,37 @@ If configuration exists, show it to the user:
 请输入选项 (1-2):
 ```
 
-**If user chooses 1 (Use existing configuration):**
+**If user chooses 1 (Use existing configuration and update ntfy CLI):**
+
+```
+✅ 使用现有配置
+
+配置详情:
+- 通知频道: <NTFY_TOPIC>
+- 服务器: <NTFY_HOST>
+- 配置文件: ~/.claude/plugins/claude-notify-plugin/config
+
+正在更新 ntfy CLI 配置...
+```
+
+Update ntfy CLI configuration:
+```bash
+mkdir -p ~/.config/ntfy
+cat > ~/.config/ntfy/client.yml << EOF
+default-host: <NTFY_HOST>
+token: <NTFY_TOKEN>
+EOF
+```
+
+```
+✅ ntfy CLI 配置已更新
+
+测试现有配置...
+```
+
+Then skip to Step 6 (Send test notification).
+
+**If user chooses 2 (Use existing configuration without updating ntfy CLI):**
 
 ```
 ✅ 使用现有配置
@@ -47,7 +115,7 @@ If configuration exists, show it to the user:
 
 Then skip to Step 6 (Send test notification).
 
-**If user chooses 2 (Reconfigure):**
+**If user chooses 3 (Reconfigure):**
 
 Continue to Step 1.
 
@@ -200,19 +268,52 @@ curl -H "Title: claude-notify-plugin 测试" -H "Priority: default" -H "Authoriz
 
 **If using existing configuration:**
 
-Show the test result:
+Check if ntfy CLI configuration matches plugin configuration:
+
+```bash
+# Read plugin config
+source ~/.claude/plugins/claude-notify-plugin/config
+
+# Read ntfy CLI config
+NTFY_CLI_HOST=$(grep "default-host:" ~/.config/ntfy/client.yml 2>/dev/null | awk '{print $2}' || echo "NOT_FOUND")
+
+# Compare
+if [ "$NTFY_HOST" = "$NTFY_CLI_HOST" ]; then
+    echo "CONFIG_MATCH"
+else
+    echo "CONFIG_MISMATCH"
+fi
+```
+
+**If configurations match:**
 ```
 ✅ 测试通知已发送！
 
 配置详情:
 - 通知频道: <NTFY_TOPIC>
 - 服务器: <NTFY_HOST>
+- ntfy CLI 配置: ✅ 一致
 
 订阅方式:
 1. 手机安装 ntfy app (iOS/Android)
 2. 添加频道: <NTFY_TOPIC>
 3. 配置服务器: <NTFY_HOST>
 4. 完成！
+
+测试通知已发送，请检查手机是否收到。
+```
+
+**If configurations don't match:**
+```
+⚠️ 配置不一致！
+
+插件配置:
+- 服务器: <NTFY_HOST>
+
+ntfy CLI 配置:
+- 服务器: <NTFY_CLI_HOST>
+
+建议: 运行 /notify:setup 并选择"使用现有配置并更新 ntfy CLI 配置"
 
 测试通知已发送，请检查手机是否收到。
 ```
