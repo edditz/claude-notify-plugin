@@ -100,6 +100,8 @@ NTFY_TOKEN=your-auth-token
 ## Supported Terminals
 
 The plugin detects if these terminals are in the foreground:
+
+**macOS:**
 - Terminal.app
 - iTerm2
 - Alacritty
@@ -107,6 +109,50 @@ The plugin detects if these terminals are in the foreground:
 - WezTerm
 - Ghostty
 - Hyper
+
+**Linux:**
+- GNOME Terminal
+- Konsole
+- Alacritty
+- Kitty
+- WezTerm
+- Ghostty
+- Hyper
+- XTerm
+
+**Windows:**
+- Windows Terminal
+- PowerShell
+- Command Prompt (cmd)
+- Git Bash
+- WSL (Windows Subsystem for Linux)
+- Alacritty
+- Kitty
+- WezTerm
+- Ghostty
+- Hyper
+
+## Platform Support
+
+| Platform | Status | Requirements |
+|----------|--------|--------------|
+| macOS | ✅ Full support | None (bash pre-installed) |
+| Linux | ✅ Full support | bash, xdotool or wmctrl (optional) |
+| Windows | ✅ Full support | Git Bash, WSL, or PowerShell |
+
+### Windows Requirements
+
+**Option 1: Git Bash (Recommended)**
+- Install [Git for Windows](https://gitforwindows.org/)
+- bash will be available in PATH
+
+**Option 2: WSL (Windows Subsystem for Linux)**
+- Install WSL: `wsl --install`
+- bash will be available via WSL
+
+**Option 3: PowerShell (Fallback)**
+- Built into Windows
+- Uses PowerShell script instead of bash
 
 ## Commands
 
@@ -118,7 +164,10 @@ The plugin detects if these terminals are in the foreground:
 
 - [ntfy CLI](https://docs.ntfy.sh/) - Recommended
 - curl - Alternative if ntfy CLI is not installed
-- Python 3 - For JSON parsing (pre-installed on macOS)
+- Python 3 - For JSON parsing
+  - macOS: Pre-installed
+  - Linux: Usually pre-installed (`python3`)
+  - Windows: Install from [python.org](https://www.python.org/downloads/) (use `python` command)
 
 ## Troubleshooting
 
@@ -127,6 +176,28 @@ The plugin detects if these terminals are in the foreground:
 1. Check ntfy CLI: `ntfy --version`
 2. Verify config: `cat ~/.claude/plugins/claude-notify-plugin/config`
 3. Test manually: `ntfy publish -m "test" <your-topic>`
+
+### Windows: "bash" not found?
+
+Install one of:
+- [Git for Windows](https://gitforwindows.org/) (includes Git Bash)
+- [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) (Windows Subsystem for Linux)
+
+Or use PowerShell fallback (no additional installation needed).
+
+### Windows: Python not found?
+
+Install Python from [python.org](https://www.python.org/downloads/) or use:
+```powershell
+# Winget
+winget install Python.Python.3
+
+# Chocolatey
+choco install python
+
+# Scoop
+scoop install python
+```
 
 ### Delayed notifications (self-hosted)?
 

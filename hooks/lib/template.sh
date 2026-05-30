@@ -23,7 +23,7 @@ build_permission_notification() {
 
     # Extract tool name from input
     local tool_name
-    tool_name=$(echo "$input" | python3 -c "import sys,json; print(json.load(sys.stdin).get('tool_name',''))" 2>/dev/null)
+    tool_name=$(echo "$input" | ${PYTHON_CMD:-python3} -c "import sys,json; print(json.load(sys.stdin).get('tool_name',''))" 2>/dev/null)
 
     # Get title and body templates (with defaults)
     local title_template="${NTFY_PERMISSION_TITLE:-Claude 需要审批}"
@@ -48,7 +48,7 @@ build_stop_notification() {
 
     # Extract message from input
     local message
-    message=$(echo "$input" | python3 -c "
+    message=$(echo "$input" | ${PYTHON_CMD:-python3} -c "
 import sys,json
 d=json.load(sys.stdin)
 msg = d.get('last_assistant_message','')
