@@ -3,6 +3,11 @@
 # claude-notify: Push notifications for Claude Code events via ntfy
 # Sends notifications when Claude needs approval or completes tasks
 
+# Debug log
+echo "$(date): Hook triggered" >> /tmp/claude-notify-debug.log
+echo "$(date): Args: $@" >> /tmp/claude-notify-debug.log
+echo "$(date): STDIN available: $([ -t 0 ] && echo 'no' || echo 'yes')" >> /tmp/claude-notify-debug.log
+
 set -euo pipefail
 
 # Get script directory
