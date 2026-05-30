@@ -85,11 +85,38 @@ send_notification() {
     fi
 }
 
+# Get project directory name
+get_project_name() {
+    basename "$(pwd)"
+}
+
+# Replace variables in template
+replace_variables() {
+    local template="$1"
+    local project_name
+    project_name=$(get_project_name)
+
+    # Replace {project_name} with actual project name
+    echo "${template//\{project_name\}/$project_name}"
+}
+
 # Send notification based on event type
 case "$event_type" in
     PermissionRequest)
         tool_name=$(echo "$input" | python3 -c "import sys,json; print(json.load(sys.stdin).get('tool_name',''))" 2>/dev/null)
-        send_notification "Claude 需要审批" "$tool_name" "4" "bell"
+
+        # Get title and body templates (with defaults)
+        title_template="${NTFY_PERMISSION_TITLE:-Claude 需要审批}"
+        body_template="${NTFY_PERMISSION_BODY:-{tool_name}}"
+
+        # Replace variables
+        title=$(replace_variables "$title_template")
+        body=$(replace_variables "$body_template")
+
+        # Replace {tool_name} with actual tool name
+        body="${body//\{tool_name\}/$tool_name}"
+
+        send_notification "$title" "$body" "4" "bell"
         ;;
     Stop)
         message=$(echo "$input" | python3 -c "
@@ -98,6 +125,18 @@ d=json.load(sys.stdin)
 msg = d.get('last_assistant_message','')
 print(msg[:100]) if msg else print('')
 " 2>/dev/null)
-        send_notification "Claude 已停止" "$message" "3" "check"
+
+        # Get title and body templates (with defaults)
+        title_template="${NTFY_STOP_TITLE:-Claude 已停止}"
+        body_template="${NTFY_STOP_BODY:-{message}}"
+
+        # Replace variables
+        title=$(replace_variables "$title_template")
+        body=$(replace_variables "$body_template")
+
+        # Replace {message} with actual message
+        body="${body//\{message\}/$message}"
+
+        send_notification "$title" "$body" "3" "check"
         ;;
 esac

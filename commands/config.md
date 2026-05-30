@@ -32,8 +32,9 @@ Ask the user which setting they want to change:
 
 1. **通知开关** - 启用/禁用所有通知
 2. **终端检查** - 是否在终端有焦点时跳过通知
-3. **通知频道** - 更改通知频道名称
-4. **服务器设置** - 更改 ntfy 服务器地址
+3. **通知内容** - 自定义通知标题和正文
+4. **通知频道** - 更改通知频道名称
+5. **服务器设置** - 更改 ntfy 服务器地址
 
 ### Step 4: Apply changes
 
@@ -67,6 +68,124 @@ else
     fi
     echo "✅ 终端检查已禁用（始终发送通知）"
 fi
+```
+
+**For 通知内容 (Notification Content):**
+
+Show available variables:
+```
+📝 自定义通知内容
+
+可用变量:
+- {tool_name} - 请求审批的工具名称
+- {message} - 最后一条消息（截取前100字符）
+- {project_name} - 当前项目目录名
+```
+
+Show current configuration:
+```
+当前配置:
+- 审批标题: Claude 需要审批
+- 审批内容: {tool_name}
+- 完成标题: Claude 已停止
+- 完成内容: {message}
+```
+
+Ask if user wants to customize:
+```
+是否要自定义通知内容？(y/n):
+```
+
+If yes, guide through customization:
+
+**Step 1: Configure PermissionRequest notification**
+```
+🔧 配置审批通知
+
+当前标题: Claude 需要审批
+当前内容: {tool_name}
+
+请输入新的标题（直接回车保持不变）:
+> [{project_name}] 需要审批
+
+请输入新的内容（直接回车保持不变）:
+> 工具: {tool_name}
+
+预览:
+┌────────────────────────────────────┐
+│ 🔔 [claude-notify-plugin] 需要审批 │
+│ 工具: Bash                         │
+└────────────────────────────────────┘
+
+确认保存？(y/n):
+```
+
+**Step 2: Configure Stop notification**
+```
+🔧 配置完成通知
+
+当前标题: Claude 已停止
+当前内容: {message}
+
+请输入新的标题（直接回车保持不变）:
+> [{project_name}] 已完成
+
+请输入新的内容（直接回车保持不变）:
+> {message}
+
+预览:
+┌────────────────────────────────────────┐
+│ ✅ [claude-notify-plugin] 已完成       │
+│ 任务已完成！文件已保存到指定目录...     │
+└────────────────────────────────────────┘
+
+确认保存？(y/n):
+```
+
+**Step 3: Save configuration**
+
+Update the config file with new values:
+```bash
+# Update or add NTFY_PERMISSION_TITLE
+if grep -q "NTFY_PERMISSION_TITLE=" ~/.claude/plugins/claude-notify-plugin/config; then
+    sed -i '' "s/NTFY_PERMISSION_TITLE=.*/NTFY_PERMISSION_TITLE=$title/" ~/.claude/plugins/claude-notify-plugin/config
+else
+    echo "NTFY_PERMISSION_TITLE=$title" >> ~/.claude/plugins/claude-notify-plugin/config
+fi
+
+# Update or add NTFY_PERMISSION_BODY
+if grep -q "NTFY_PERMISSION_BODY=" ~/.claude/plugins/claude-notify-plugin/config; then
+    sed -i '' "s/NTFY_PERMISSION_BODY=.*/NTFY_PERMISSION_BODY=$body/" ~/.claude/plugins/claude-notify-plugin/config
+else
+    echo "NTFY_PERMISSION_BODY=$body" >> ~/.claude/plugins/claude-notify-plugin/config
+fi
+
+# Update or add NTFY_STOP_TITLE
+if grep -q "NTFY_STOP_TITLE=" ~/.claude/plugins/claude-notify-plugin/config; then
+    sed -i '' "s/NTFY_STOP_TITLE=.*/NTFY_STOP_TITLE=$title/" ~/.claude/plugins/claude-notify-plugin/config
+else
+    echo "NTFY_STOP_TITLE=$title" >> ~/.claude/plugins/claude-notify-plugin/config
+fi
+
+# Update or add NTFY_STOP_BODY
+if grep -q "NTFY_STOP_BODY=" ~/.claude/plugins/claude-notify-plugin/config; then
+    sed -i '' "s/NTFY_STOP_BODY=.*/NTFY_STOP_BODY=$body/" ~/.claude/plugins/claude-notify-plugin/config
+else
+    echo "NTFY_STOP_BODY=$body" >> ~/.claude/plugins/claude-notify-plugin/config
+fi
+```
+
+Show completion message:
+```
+✅ 通知内容配置完成！
+
+新的配置:
+- 审批标题: [{project_name}] 需要审批
+- 审批内容: 工具: {tool_name}
+- 完成标题: [{project_name}] 已完成
+- 完成内容: {message}
+
+配置已保存到: ~/.claude/plugins/claude-notify-plugin/config
 ```
 
 ### Step 5: Confirm changes

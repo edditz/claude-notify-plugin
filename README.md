@@ -64,6 +64,16 @@ NTFY_ENABLED=true
 # Set to "false" to always send notifications regardless of terminal focus
 NTFY_TERMINAL_CHECK=true
 
+# Optional: Custom notification templates
+# Available variables:
+#   {tool_name} - Tool requesting permission (PermissionRequest only)
+#   {message} - Last assistant message (Stop only)
+#   {project_name} - Current project directory name
+NTFY_PERMISSION_TITLE=Claude 需要审批
+NTFY_PERMISSION_BODY={tool_name}
+NTFY_STOP_TITLE=Claude 已停止
+NTFY_STOP_BODY={message}
+
 # Optional: Custom ntfy server (default: https://ntfy.sh)
 NTFY_HOST=https://ntfy.example.com
 
