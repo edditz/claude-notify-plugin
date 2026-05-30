@@ -59,6 +59,10 @@ NTFY_TOPIC=claude-a3f8b2c1d4e5f6
 # Optional: Enable/disable notifications (default: true)
 NTFY_ENABLED=true
 
+# Optional: Skip notification when terminal has focus (default: true)
+# Set to "false" to always send notifications regardless of terminal focus
+NTFY_TERMINAL_CHECK=true
+
 # Optional: Custom ntfy server URL (default: https://ntfy.sh)
 NTFY_HOST=https://ntfy.example.com
 
@@ -110,6 +114,7 @@ Visit `https://ntfy.sh/<your-topic>` (or your custom server URL)
 
 - `/notify:setup` - Interactive setup wizard
 - `/notify:toggle` - Toggle notifications on/off
+- `/notify:config` - Configure notification settings
 
 ## Dependencies
 

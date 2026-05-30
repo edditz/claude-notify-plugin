@@ -41,8 +41,8 @@ is_terminal_foreground() {
     return 1
 }
 
-# Skip notification if terminal is in foreground
-if is_terminal_foreground; then
+# Skip notification if terminal is in foreground (when NTFY_TERMINAL_CHECK is enabled)
+if [ "${NTFY_TERMINAL_CHECK:-true}" = "true" ] && is_terminal_foreground; then
     exit 0
 fi
 
