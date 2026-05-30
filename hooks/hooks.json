@@ -6,9 +6,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/.claude/plugins/cache/edditz-plugins/claude-notify-plugin/1.0.0/hooks/ntfy-notify.sh",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/ntfy-notify.sh\"",
             "async": true,
-            "windows_command": "~/.claude/plugins/cache/edditz-plugins/claude-notify-plugin/1.0.0/hooks/ntfy-notify.cmd"
+            "windows_command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/ntfy-notify.cmd\""
           }
         ]
       }
@@ -18,9 +18,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/.claude/plugins/cache/edditz-plugins/claude-notify-plugin/1.0.0/hooks/ntfy-notify.sh",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/ntfy-notify.sh\"",
             "async": true,
-            "windows_command": "~/.claude/plugins/cache/edditz-plugins/claude-notify-plugin/1.0.0/hooks/ntfy-notify.cmd"
+            "windows_command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/ntfy-notify.cmd\""
           }
         ]
       }
