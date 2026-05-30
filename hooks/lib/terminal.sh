@@ -67,7 +67,16 @@ is_terminal_foreground() {
                 local active_lower
                 active_lower=$(echo "$active_window" | tr '[:upper:]' '[:lower:]')
                 case "$active_lower" in
-                    *terminal*|*windows terminal*|*powershell*|*cmd*|*git bash*|*wsl*|*alacritty*|*kitty*|*wezterm*|*ghostty*|*hyper*) return 0 ;;
+                    *terminal*) return 0 ;;
+                    *powershell*) return 0 ;;
+                    *cmd*) return 0 ;;
+                    *git*bash*) return 0 ;;
+                    *wsl*) return 0 ;;
+                    *alacritty*) return 0 ;;
+                    *kitty*) return 0 ;;
+                    *wezterm*) return 0 ;;
+                    *ghostty*) return 0 ;;
+                    *hyper*) return 0 ;;
                     *) return 1 ;;
                 esac
             else
