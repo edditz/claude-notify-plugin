@@ -1,0 +1,16 @@
+{
+  "name": "claude-notify",
+  "description": "Push notifications for Claude Code events via ntfy - get notified on your phone/watch when Claude needs approval or completes tasks",
+  "version": "1.0.0",
+  "author": {
+    "name": "Eddie"
+  },
+  "license": "MIT",
+  "keywords": [
+    "notifications",
+    "ntfy",
+    "push-notifications",
+    "mobile",
+    "alerts"
+  ]
+}
