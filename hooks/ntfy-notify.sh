@@ -6,7 +6,7 @@
 set -euo pipefail
 
 # Read configuration
-CONFIG_FILE="${HOME}/.claude/plugins/claude-notify/config"
+CONFIG_FILE="${HOME}/.claude/plugins/claude-notify-plugin/config"
 if [ -f "$CONFIG_FILE" ]; then
     source "$CONFIG_FILE"
 fi

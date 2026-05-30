@@ -1,6 +1,6 @@
 # /notify:setup
 
-Setup command for claude-notify plugin. Guides users through configuring ntfy notifications.
+Setup command for claude-notify-plugin. Guides users through configuring ntfy notifications.
 
 ## Instructions
 
@@ -49,10 +49,10 @@ openssl rand -hex 16
 Create the config directory and file:
 
 ```bash
-mkdir -p ~/.claude/plugins/claude-notify
+mkdir -p ~/.claude/plugins/claude-notify-plugin
 ```
 
-Write the configuration to `~/.claude/plugins/claude-notify/config`:
+Write the configuration to `~/.claude/plugins/claude-notify-plugin/config`:
 
 ```ini
 NTFY_TOPIC=<generated-topic>
@@ -69,8 +69,8 @@ The hooks are already configured in the plugin's `hooks/hooks.json` file. No man
 Send a test notification to verify the setup:
 
 ```bash
-source ~/.claude/plugins/claude-notify/config
-ntfy publish --title "claude-notify 测试" --priority 3 --quiet -m "通知配置成功！" "$NTFY_TOPIC"
+source ~/.claude/plugins/claude-notify-plugin/config
+ntfy publish --title "claude-notify-plugin 测试" --priority 3 --quiet -m "通知配置成功！" "$NTFY_TOPIC"
 ```
 
 ### Step 7: Provide subscription instructions
@@ -92,12 +92,12 @@ Tell the user how to subscribe to notifications:
 ## Example Output
 
 ```
-✅ claude-notify 配置完成！
+✅ claude-notify-plugin 配置完成！
 
 配置详情:
 - 通知频道: claude-a3f8b2c1d4e5f6
 - 服务器: https://ntfy.sh
-- 配置文件: ~/.claude/plugins/claude-notify/config
+- 配置文件: ~/.claude/plugins/claude-notify-plugin/config
 
 订阅方式:
 1. 手机安装 ntfy app (iOS/Android)

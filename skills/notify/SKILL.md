@@ -1,4 +1,4 @@
-# claude-notify
+# claude-notify-plugin
 
 Push notifications for Claude Code events via ntfy. Get notified on your phone or watch when Claude needs approval or completes tasks.
 
@@ -50,7 +50,7 @@ Supported terminals:
 
 ## Configuration
 
-Configuration file: `~/.claude/plugins/claude-notify/config`
+Configuration file: `~/.claude/plugins/claude-notify-plugin/config`
 
 ```ini
 # Required: Notification topic/channel name
@@ -91,7 +91,7 @@ Visit `https://ntfy.sh/<your-topic>` (or your custom server URL)
 
 ### No notifications received
 1. Check if ntfy CLI is installed: `ntfy --version`
-2. Verify configuration: `cat ~/.claude/plugins/claude-notify/config`
+2. Verify configuration: `cat ~/.claude/plugins/claude-notify-plugin/config`
 3. Test manually: `ntfy publish -m "test" <your-topic>`
 4. Check if terminal is in foreground (notifications are skipped)
 
