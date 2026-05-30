@@ -51,9 +51,9 @@ send_via_ntfy() {
     [ -n "$tags" ] && args+=(--tags "${tags}")
 
     # Configure custom server and token if specified
+    local temp_config=""
     if [ -n "${NTFY_HOST:-}" ] || [ -n "${NTFY_TOKEN:-}" ]; then
         # Create temporary config for custom host and token
-        local temp_config
         temp_config=$(mktemp)
 
         # Write config
@@ -67,11 +67,11 @@ send_via_ntfy() {
         args+=("--config" "$temp_config")
     fi
 
-    # Send notification in background
-    ntfy publish "${args[@]}" -m "${message}" "${NTFY_TOPIC}" &
+    # Send notification (wait for completion to ensure temp config is available)
+    ntfy publish "${args[@]}" -m "${message}" "${NTFY_TOPIC}"
 
     # Cleanup temp config if created
-    if [ -n "${temp_config:-}" ] && [ -f "${temp_config:-}" ]; then
+    if [ -n "$temp_config" ] && [ -f "$temp_config" ]; then
         rm -f "$temp_config"
     fi
 }
