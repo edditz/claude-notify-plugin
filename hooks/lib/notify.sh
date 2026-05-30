@@ -50,18 +50,21 @@ send_via_ntfy() {
     local -a args=(--title "${title}" --priority "${priority}" --quiet)
     [ -n "$tags" ] && args+=(--tags "${tags}")
 
-    # Configure custom server if specified
-    if [ -n "${NTFY_HOST:-}" ]; then
-        # Create temporary config for custom host
+    # Configure custom server and token if specified
+    if [ -n "${NTFY_HOST:-}" ] || [ -n "${NTFY_TOKEN:-}" ]; then
+        # Create temporary config for custom host and token
         local temp_config
         temp_config=$(mktemp)
-        echo "default-host: ${NTFY_HOST}" > "$temp_config"
-        args+=("--config" "$temp_config")
-    fi
 
-    # Set token if configured
-    if [ -n "${NTFY_TOKEN:-}" ]; then
-        export NTFY_TOKEN
+        # Write config
+        if [ -n "${NTFY_HOST:-}" ]; then
+            echo "default-host: ${NTFY_HOST}" > "$temp_config"
+        fi
+        if [ -n "${NTFY_TOKEN:-}" ]; then
+            echo "token: ${NTFY_TOKEN}" >> "$temp_config"
+        fi
+
+        args+=("--config" "$temp_config")
     fi
 
     # Send notification in background

@@ -86,6 +86,27 @@ Ask the user:
    - Server URL (e.g., https://ntfy.example.com)
    - Authentication token (if required)
 
+**If using ntfy CLI and custom server:**
+
+Configure ntfy CLI to use the custom server:
+
+```bash
+# Create ntfy client config directory
+mkdir -p ~/.config/ntfy
+
+# Write client configuration
+cat > ~/.config/ntfy/client.yml << EOF
+default-host: <server-url>
+EOF
+```
+
+Or use environment variable:
+```bash
+export NTFY_HOST=<server-url>
+```
+
+Note: The plugin uses `--config` flag to specify the server, so CLI configuration is optional. But configuring it makes manual testing easier.
+
 ### Step 3: Generate topic
 
 Generate a random topic name:
