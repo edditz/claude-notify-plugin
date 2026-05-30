@@ -22,10 +22,17 @@ if [ -z "${NTFY_TOPIC:-}" ]; then
     exit 1
 fi
 
-# Check if ntfy CLI is installed
+# Check notification method (ntfy CLI or curl)
+USE_CURL=false
 if ! command -v ntfy &> /dev/null; then
-    echo "Error: ntfy CLI not installed. Install with: brew install ntfy" >&2
-    exit 1
+    if command -v curl &> /dev/null; then
+        USE_CURL=true
+    else
+        echo "Error: Neither ntfy CLI nor curl is installed." >&2
+        echo "Install ntfy: brew install ntfy" >&2
+        echo "Or install curl: usually pre-installed on most systems" >&2
+        exit 1
+    fi
 fi
 
 # Detect if terminal is in foreground (skip notifications when user is watching)
@@ -59,29 +66,49 @@ send_notification() {
     local priority="${3:-3}"
     local tags="${4:-}"
 
-    local -a args=(--title "${title}" --priority "${priority}" --quiet)
-    [ -n "$tags" ] && args+=(--tags "${tags}")
+    if [ "$USE_CURL" = "true" ]; then
+        # Use curl as fallback
+        local url="${NTFY_HOST:-https://ntfy.sh}/${NTFY_TOPIC}"
+        local -a curl_args=(-s -o /dev/null)
 
-    # Configure custom server if specified
-    if [ -n "${NTFY_HOST:-}" ]; then
-        # Create temporary config for custom host
-        local temp_config
-        temp_config=$(mktemp)
-        echo "default-host: ${NTFY_HOST}" > "$temp_config"
-        args+=("--config" "$temp_config")
-    fi
+        # Add headers
+        curl_args+=(-H "Title: ${title}")
+        curl_args+=(-H "Priority: ${priority}")
+        [ -n "$tags" ] && curl_args+=(-H "Tags: ${tags}")
 
-    # Set token if configured
-    if [ -n "${NTFY_TOKEN:-}" ]; then
-        export NTFY_TOKEN
-    fi
+        # Add authentication if token is configured
+        if [ -n "${NTFY_TOKEN:-}" ]; then
+            curl_args+=(-H "Authorization: Bearer ${NTFY_TOKEN}")
+        fi
 
-    # Send notification in background
-    ntfy publish "${args[@]}" -m "${message}" "${NTFY_TOPIC}" &
+        # Send notification in background
+        curl "${curl_args[@]}" -d "${message}" "${url}" &
+    else
+        # Use ntfy CLI
+        local -a args=(--title "${title}" --priority "${priority}" --quiet)
+        [ -n "$tags" ] && args+=(--tags "${tags}")
 
-    # Cleanup temp config if created
-    if [ -n "${temp_config:-}" ] && [ -f "${temp_config:-}" ]; then
-        rm -f "$temp_config"
+        # Configure custom server if specified
+        if [ -n "${NTFY_HOST:-}" ]; then
+            # Create temporary config for custom host
+            local temp_config
+            temp_config=$(mktemp)
+            echo "default-host: ${NTFY_HOST}" > "$temp_config"
+            args+=("--config" "$temp_config")
+        fi
+
+        # Set token if configured
+        if [ -n "${NTFY_TOKEN:-}" ]; then
+            export NTFY_TOKEN
+        fi
+
+        # Send notification in background
+        ntfy publish "${args[@]}" -m "${message}" "${NTFY_TOPIC}" &
+
+        # Cleanup temp config if created
+        if [ -n "${temp_config:-}" ] && [ -f "${temp_config:-}" ]; then
+            rm -f "$temp_config"
+        fi
     fi
 }
 

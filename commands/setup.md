@@ -14,19 +14,69 @@ First, check if ntfy CLI is installed:
 command -v ntfy && ntfy --version || echo "NOT_INSTALLED"
 ```
 
-If not installed, guide the user to install it:
+If not installed, show options to the user:
 
-**macOS:**
-```bash
-brew install ntfy
+```
+⚠️ 检测到未安装 ntfy CLI
+
+ntfy CLI 是发送通知的推荐方式，但不是必须的。
+
+请选择:
+1. 安装 ntfy CLI (推荐)
+2. 使用 curl 备选方案 (无需安装)
+
+请输入选项 (1-2):
 ```
 
-**Linux:**
-```bash
-curl -sSL https://packages.ntfy.sh/KEY.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/ntfy.gpg
-echo "deb [signed-by=/etc/apt/keyrings/ntfy.gpg] https://packages.ntfy.sh/stable/ debian main" | sudo tee /etc/apt/sources.list.d/ntfy.list
-sudo apt update && sudo apt install ntfy
+**If user chooses 1 (Install ntfy CLI):**
+
+Show installation instructions for different platforms:
+
 ```
+📦 安装 ntfy CLI
+
+请选择你的操作系统:
+
+macOS (Homebrew):
+  brew install ntfy
+
+macOS (MacPorts):
+  sudo port install ntfy
+
+Linux (Debian/Ubuntu):
+  curl -sSL https://packages.ntfy.sh/KEY.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/ntfy.gpg
+  echo "deb [signed-by=/etc/apt/keyrings/ntfy.gpg] https://packages.ntfy.sh/stable/ debian main" | sudo tee /etc/apt/sources.list.d/ntfy.list
+  sudo apt update && sudo apt install ntfy
+
+Linux (Fedora/RHEL):
+  sudo dnf install ntfy
+
+Linux (Arch):
+  yay -S ntfy
+
+Windows (Scoop):
+  scoop install ntfy
+
+Windows (Chocolatey):
+  choco install ntfy
+
+Windows (Winget):
+  winget install ntfy
+
+安装完成后，请重新运行 /notify:setup
+```
+
+**If user chooses 2 (Use curl):**
+
+```
+✅ 使用 curl 备选方案
+
+curl 通常已预装在大多数系统中。插件将使用 curl 发送通知。
+
+注意: curl 方案功能较少，但基本通知功能正常。
+```
+
+Then continue to Step 2, but set a flag to use curl instead of ntfy CLI.
 
 ### Step 2: Ask about server configuration
 
@@ -70,10 +120,19 @@ The hooks are already configured in the plugin's `hooks/hooks.json` file. No man
 
 Send a test notification to verify the setup:
 
+**If using ntfy CLI:**
 ```bash
 source ~/.claude/plugins/claude-notify-plugin/config
 ntfy publish --title "claude-notify-plugin 测试" --priority 3 --quiet -m "通知配置成功！" "$NTFY_TOPIC"
 ```
+
+**If using curl:**
+```bash
+source ~/.claude/plugins/claude-notify-plugin/config
+curl -H "Title: claude-notify-plugin 测试" -H "Priority: default" -d "通知配置成功！" "$NTFY_HOST/$NTFY_TOPIC"
+```
+
+Note: If using public ntfy.sh server, the URL is `https://ntfy.sh/$NTFY_TOPIC`
 
 ### Step 7: Provide subscription instructions
 

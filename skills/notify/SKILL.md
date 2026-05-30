@@ -128,7 +128,8 @@ Visit `https://ntfy.sh/<your-topic>` (or your custom server URL)
 
 ## Dependencies
 
-- [ntfy CLI](https://docs.ntfy.sh/) - Required for sending notifications
+- [ntfy CLI](https://docs.ntfy.sh/) - Recommended for sending notifications
+- curl - Alternative if ntfy CLI is not installed
 - Python 3 - Used for JSON parsing (pre-installed on macOS)
 
 ## Privacy

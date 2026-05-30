@@ -116,7 +116,8 @@ The plugin detects if these terminals are in the foreground:
 
 ## Dependencies
 
-- [ntfy CLI](https://docs.ntfy.sh/) - Required
+- [ntfy CLI](https://docs.ntfy.sh/) - Recommended
+- curl - Alternative if ntfy CLI is not installed
 - Python 3 - For JSON parsing (pre-installed on macOS)
 
 ## Troubleshooting
