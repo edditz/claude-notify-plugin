@@ -11,6 +11,11 @@ if [ -f "$CONFIG_FILE" ]; then
     source "$CONFIG_FILE"
 fi
 
+# Check if notifications are disabled
+if [ "${NTFY_ENABLED:-true}" = "false" ]; then
+    exit 0
+fi
+
 # Validate required configuration
 if [ -z "${NTFY_TOPIC:-}" ]; then
     echo "Error: NTFY_TOPIC not configured. Run /notify:setup first." >&2

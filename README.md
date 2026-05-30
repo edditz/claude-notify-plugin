@@ -9,6 +9,7 @@ Push notifications for Claude Code events via ntfy. Get notified on your phone o
 - 📱 **Mobile Notifications** - Receive alerts on your phone/watch
 - 🖥️ **Smart Detection** - Skips notifications when you're watching the terminal
 - 🏠 **Self-Hosted Support** - Use your own ntfy server
+- 🔕 **Easy Toggle** - Enable/disable notifications with one command
 
 ## Quick Start
 
@@ -56,6 +57,9 @@ Configuration file: `~/.claude/plugins/claude-notify-plugin/config`
 # Required: Your unique notification topic
 NTFY_TOPIC=claude-a3f8b2c1d4e5f6
 
+# Optional: Enable/disable notifications (default: true)
+NTFY_ENABLED=true
+
 # Optional: Custom ntfy server (default: https://ntfy.sh)
 NTFY_HOST=https://ntfy.example.com
 
@@ -93,6 +97,7 @@ The plugin detects if these terminals are in the foreground:
 ## Commands
 
 - `/notify:setup` - Interactive setup wizard
+- `/notify:toggle` - Toggle notifications on/off
 
 ## Dependencies
 

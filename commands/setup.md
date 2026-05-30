@@ -56,6 +56,7 @@ Write the configuration to `~/.claude/plugins/claude-notify-plugin/config`:
 
 ```ini
 NTFY_TOPIC=<generated-topic>
+NTFY_ENABLED=true
 NTFY_HOST=<server-url-or-empty>
 NTFY_TOKEN=<token-or-empty>
 ```
