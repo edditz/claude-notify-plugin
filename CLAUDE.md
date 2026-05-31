@@ -49,17 +49,18 @@ Stored at `~/.claude/plugins/claude-notify-plugin/config` (sourced as shell vari
 
 ## Publishing Workflow
 
-After pushing this plugin to its remote repository, you MUST also sync the marketplace registry at `/Users/eddie/github-projects/claude-plugins-marketplace`:
+After pushing this plugin to its remote repository, update the marketplace SHA via GitHub API (no local checkout needed):
 
 1. Push this repo: `git push origin main`
 2. Get the latest commit SHA: `git rev-parse HEAD`
-3. Update the plugin's `sha` field in `/Users/eddie/github-projects/claude-plugins-marketplace/.claude-plugin/marketplace.json` (under `plugins[].source.sha`)
-4. Commit and push the marketplace repo:
+3. Update the marketplace registry via `gh`:
    ```bash
-   cd /Users/eddie/github-projects/claude-plugins-marketplace
-   git add .claude-plugin/marketplace.json
-   git commit -m "chore: Update claude-notify-plugin SHA to <short-sha>"
-   git push origin main
+   REPO=edditz/claude-plugins-marketplace
+   FILE=.claude-plugin/marketplace.json
+   FILE_SHA=$(gh api repos/$REPO/contents/$FILE --jq '.sha')
+   CONTENT=$(gh api repos/$REPO/contents/$FILE --jq '.content' | base64 -d)
+   UPDATED=$(echo "$CONTENT" | python3 -c "import sys,json; d=json.load(sys.stdin); [p['source'].__setitem__('sha','$(git rev-parse HEAD)') for p in d['plugins'] if p['name']=='claude-notify-plugin']; print(json.dumps(d,indent=2))")
+   echo "$UPDATED" | base64 | gh api repos/$REPO/contents/$FILE -X PUT -f message="chore: Update claude-notify-plugin SHA to $(git rev-parse --short HEAD)" -f content=@- -f sha="$FILE_SHA" --input content
    ```
 
 The marketplace uses the SHA to pin which commit of this plugin users install.
