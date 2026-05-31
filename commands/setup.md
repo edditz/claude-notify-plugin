@@ -218,7 +218,7 @@ Or use environment variable:
 export NTFY_HOST=<server-url>
 ```
 
-Note: The plugin uses `--config` flag to specify the server, so CLI configuration is optional. But configuring it makes manual testing easier.
+Note: The plugin uses `--token` flag and full URL (`${NTFY_HOST}/${NTFY_TOPIC}`) to send notifications, so CLI configuration is optional. But configuring it makes manual testing easier.
 
 ### Step 3: Generate topic
 
@@ -257,7 +257,7 @@ Send a test notification to verify the setup:
 **If using ntfy CLI:**
 ```bash
 source ~/.claude/plugins/claude-notify-plugin/config
-ntfy publish --config <(echo -e "default-host: $NTFY_HOST\ntoken: $NTFY_TOKEN") --title "claude-notify-plugin 测试" --priority 3 --quiet -m "通知配置成功！" "$NTFY_TOPIC"
+ntfy publish ${NTFY_TOKEN:+--token "$NTFY_TOKEN"} --title "claude-notify-plugin 测试" --priority 3 --quiet -m "通知配置成功！" "${NTFY_HOST:-https://ntfy.sh}/${NTFY_TOPIC}"
 ```
 
 **If using curl:**
@@ -268,20 +268,19 @@ curl -H "Title: claude-notify-plugin 测试" -H "Priority: default" -H "Authoriz
 
 **If using existing configuration:**
 
-Check if ntfy CLI configuration matches plugin configuration:
+Check which notification method is available and send test accordingly:
 
 ```bash
 # Read plugin config
 source ~/.claude/plugins/claude-notify-plugin/config
 
-# Read ntfy CLI config
-NTFY_CLI_HOST=$(grep "default-host:" ~/.config/ntfy/client.yml 2>/dev/null | awk '{print $2}' || echo "NOT_FOUND")
-
-# Compare
-if [ "$NTFY_HOST" = "$NTFY_CLI_HOST" ]; then
-    echo "CONFIG_MATCH"
+# Detect notification method
+if command -v ntfy &> /dev/null; then
+    # Use ntfy CLI
+    ntfy publish ${NTFY_TOKEN:+--token "$NTFY_TOKEN"} --title "claude-notify-plugin 测试" --priority 3 --quiet -m "通知配置成功！" "${NTFY_HOST:-https://ntfy.sh}/${NTFY_TOPIC}"
 else
-    echo "CONFIG_MISMATCH"
+    # Use curl fallback
+    curl -s -o /dev/null -w "HTTP Status: %{http_code}\n" -H "Title: claude-notify-plugin 测试" -H "Priority: default" ${NTFY_TOKEN:+-H "Authorization: Bearer $NTFY_TOKEN"} -d "通知配置成功！" "${NTFY_HOST:-https://ntfy.sh}/${NTFY_TOPIC}"
 fi
 ```
 

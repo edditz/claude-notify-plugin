@@ -50,28 +50,16 @@ send_via_ntfy() {
     local -a args=(--title "${title}" --priority "${priority}" --quiet)
     [ -n "$tags" ] && args+=(--tags "${tags}")
 
-    # Configure custom server and token if specified
-    local temp_config=""
-    if [ -n "${NTFY_HOST:-}" ] || [ -n "${NTFY_TOKEN:-}" ]; then
-        # Create temporary config for custom host and token
-        temp_config=$(mktemp)
-
-        # Write config
-        if [ -n "${NTFY_HOST:-}" ]; then
-            echo "default-host: ${NTFY_HOST}" > "$temp_config"
-        fi
-        if [ -n "${NTFY_TOKEN:-}" ]; then
-            echo "token: ${NTFY_TOKEN}" >> "$temp_config"
-        fi
-
-        args+=("--config" "$temp_config")
+    # Add token if configured
+    if [ -n "${NTFY_TOKEN:-}" ]; then
+        args+=(--token "${NTFY_TOKEN}")
     fi
 
-    # Send notification (wait for completion to ensure temp config is available)
-    ntfy publish "${args[@]}" -m "${message}" "${NTFY_TOPIC}"
-
-    # Cleanup temp config if created
-    if [ -n "$temp_config" ] && [ -f "$temp_config" ]; then
-        rm -f "$temp_config"
+    # Build topic URL with custom host if specified
+    local topic_url="${NTFY_TOPIC}"
+    if [ -n "${NTFY_HOST:-}" ]; then
+        topic_url="${NTFY_HOST}/${NTFY_TOPIC}"
     fi
+
+    ntfy publish "${args[@]}" -m "${message}" "${topic_url}"
 }
