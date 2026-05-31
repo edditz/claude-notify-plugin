@@ -13,3 +13,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Claude Code plugin in-use markers
+.in_use/
