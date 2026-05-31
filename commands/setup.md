@@ -257,7 +257,11 @@ Send a test notification to verify the setup:
 **If using ntfy CLI:**
 ```bash
 source ~/.claude/plugins/claude-notify-plugin/config
-ntfy publish ${NTFY_TOKEN:+--token "$NTFY_TOKEN"} --title "claude-notify-plugin 测试" --priority 3 --quiet -m "通知配置成功！" "${NTFY_HOST:-https://ntfy.sh}/${NTFY_TOPIC}"
+if [ -n "${NTFY_TOKEN:-}" ]; then
+    ntfy publish --token "$NTFY_TOKEN" --title "claude-notify-plugin 测试" --priority 3 --quiet -m "通知配置成功！" "${NTFY_HOST:-https://ntfy.sh}/${NTFY_TOPIC}"
+else
+    ntfy publish --title "claude-notify-plugin 测试" --priority 3 --quiet -m "通知配置成功！" "${NTFY_HOST:-https://ntfy.sh}/${NTFY_TOPIC}"
+fi
 ```
 
 **If using curl:**
@@ -277,10 +281,18 @@ source ~/.claude/plugins/claude-notify-plugin/config
 # Detect notification method
 if command -v ntfy &> /dev/null; then
     # Use ntfy CLI
-    ntfy publish ${NTFY_TOKEN:+--token "$NTFY_TOKEN"} --title "claude-notify-plugin 测试" --priority 3 --quiet -m "通知配置成功！" "${NTFY_HOST:-https://ntfy.sh}/${NTFY_TOPIC}"
+    if [ -n "${NTFY_TOKEN:-}" ]; then
+        ntfy publish --token "$NTFY_TOKEN" --title "claude-notify-plugin 测试" --priority 3 --quiet -m "通知配置成功！" "${NTFY_HOST:-https://ntfy.sh}/${NTFY_TOPIC}"
+    else
+        ntfy publish --title "claude-notify-plugin 测试" --priority 3 --quiet -m "通知配置成功！" "${NTFY_HOST:-https://ntfy.sh}/${NTFY_TOPIC}"
+    fi
 else
     # Use curl fallback
-    curl -s -o /dev/null -w "HTTP Status: %{http_code}\n" -H "Title: claude-notify-plugin 测试" -H "Priority: default" ${NTFY_TOKEN:+-H "Authorization: Bearer $NTFY_TOKEN"} -d "通知配置成功！" "${NTFY_HOST:-https://ntfy.sh}/${NTFY_TOPIC}"
+    if [ -n "${NTFY_TOKEN:-}" ]; then
+        curl -s -o /dev/null -w "HTTP Status: %{http_code}\n" -H "Title: claude-notify-plugin 测试" -H "Priority: default" -H "Authorization: Bearer $NTFY_TOKEN" -d "通知配置成功！" "${NTFY_HOST:-https://ntfy.sh}/${NTFY_TOPIC}"
+    else
+        curl -s -o /dev/null -w "HTTP Status: %{http_code}\n" -H "Title: claude-notify-plugin 测试" -H "Priority: default" -d "通知配置成功！" "${NTFY_HOST:-https://ntfy.sh}/${NTFY_TOPIC}"
+    fi
 fi
 ```
 
