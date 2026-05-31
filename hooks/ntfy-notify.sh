@@ -24,6 +24,7 @@ source "${SCRIPT_DIR}/lib/config.sh"
 source "${SCRIPT_DIR}/lib/terminal.sh"
 source "${SCRIPT_DIR}/lib/notify.sh"
 source "${SCRIPT_DIR}/lib/template.sh"
+source "${SCRIPT_DIR}/lib/remote-approve.sh"
 
 # Initialize
 load_config
@@ -37,6 +38,9 @@ log_debug "Config validated"
 
 check_notification_method
 log_debug "Notification method: USE_CURL=${USE_CURL:-false}"
+
+validate_remote_approve_config
+log_debug "Remote approve: ${NTFY_REMOTE_APPROVE:-false}, timeout: ${NTFY_REMOTE_TIMEOUT:-300}"
 
 check_terminal_focus
 log_debug "Terminal focus check passed (not foreground or check disabled)"
@@ -52,11 +56,17 @@ log_debug "Event type: ${event_type:-empty}"
 # Process event and send notification
 case "$event_type" in
     PermissionRequest)
-        notification=$(build_permission_notification "$input")
-        IFS='|' read -r title body priority tags <<< "$notification"
-        log_debug "Sending PermissionRequest notification: title=$title, body=$body"
-        send_notification "$title" "$body" "$priority" "$tags"
-        log_debug "PermissionRequest notification sent"
+        if [ "${NTFY_REMOTE_APPROVE:-false}" = "true" ]; then
+            log_debug "Remote approval enabled, starting approval workflow"
+            handle_remote_approval "$input"
+            log_debug "Remote approval workflow completed"
+        else
+            notification=$(build_permission_notification "$input")
+            IFS='|' read -r title body priority tags <<< "$notification"
+            log_debug "Sending PermissionRequest notification: title=$title, body=$body"
+            send_notification "$title" "$body" "$priority" "$tags"
+            log_debug "PermissionRequest notification sent"
+        fi
         ;;
     Stop)
         notification=$(build_stop_notification "$input")

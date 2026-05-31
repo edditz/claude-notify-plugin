@@ -250,6 +250,44 @@ NTFY_TOKEN=<token-or-empty>
 
 The hooks are already configured in the plugin's `hooks/hooks.json` file. No manual configuration needed.
 
+### Step 5.5: Remote Approval Configuration
+
+Ask the user:
+
+```
+是否启用远程审批？(Enable remote approval?)
+
+当 Claude 需要审批时，你可以在手机上直接批准或拒绝，无需回到终端。
+When Claude needs approval, you can approve or deny directly from your phone without returning to the terminal.
+
+注意: 需要配置 NTFY_TOKEN (认证令牌) 才能使用远程审批。
+Note: NTFY_TOKEN (authentication token) is required for remote approval.
+
+启用远程审批？(Enable remote approval?) (y/n, default: n):
+```
+
+**If yes:**
+1. Verify NTFY_TOKEN is set (if not, prompt for it and update config)
+2. Add to config file:
+```bash
+echo "NTFY_REMOTE_APPROVE=true" >> ~/.claude/plugins/claude-notify-plugin/config
+echo "NTFY_REMOTE_TIMEOUT=300" >> ~/.claude/plugins/claude-notify-plugin/config
+```
+3. Explain:
+```
+✅ 远程审批已启用
+
+行为:
+- Claude 需要审批时，你会收到带有「Approve/Deny」按钮的通知
+- 点击按钮即可远程决策，无需回到终端
+- 如果超时未响应（默认5分钟），Claude Code 会显示正常的审批界面
+```
+
+**If no:**
+```bash
+echo "NTFY_REMOTE_APPROVE=false" >> ~/.claude/plugins/claude-notify-plugin/config
+```
+
 ### Step 6: Send test notification
 
 Send a test notification to verify the setup:

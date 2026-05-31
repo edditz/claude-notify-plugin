@@ -78,6 +78,36 @@ NTFY_HOST=https://ntfy.example.com
 
 # Optional: Authentication token for self-hosted servers
 NTFY_TOKEN=your-auth-token
+
+# Optional: Enable remote approval from phone (default: false)
+# When enabled, permission notifications include Approve/Deny buttons
+NTFY_REMOTE_APPROVE=false
+
+# Optional: Timeout for remote approval response in seconds (default: 300)
+NTFY_REMOTE_TIMEOUT=300
+```
+
+### Remote Approval
+
+When enabled, permission notifications include **Approve** and **Deny** buttons. Tap a button on your phone to approve or deny without returning to the terminal.
+
+**Requirements:**
+- `NTFY_TOKEN` must be configured (action buttons need auth to publish response)
+- Works with both ntfy CLI and curl fallback
+
+**Behavior:**
+- **Approve**: Claude proceeds immediately
+- **Deny**: Claude is denied with reason "Denied by user via remote notification"
+- **Timeout** (no response within `NTFY_REMOTE_TIMEOUT` seconds): Claude Code shows its normal permission UI in terminal
+
+**How it works:**
+```
+Claude needs approval
+  → Notification with Approve/Deny buttons sent to phone
+  → User taps button → ntfy publishes to response topic
+  → Hook subscribes to response topic, receives decision
+  → Hook outputs decision to stdout
+  → Claude Code auto-approves or auto-denies
 ```
 
 ### Self-Hosted Server Notes

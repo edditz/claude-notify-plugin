@@ -10,7 +10,7 @@ A Claude Code plugin that pushes mobile notifications (via ntfy) when Claude nee
 
 **Event flow**: Claude Code hook → `hooks/ntfy-notify.sh` → library modules → ntfy CLI/curl → mobile device
 
-The main script (`hooks/ntfy-notify.sh`) is modular — it sources four libraries from `hooks/lib/`:
+The main script (`hooks/ntfy-notify.sh`) is modular — it sources five libraries from `hooks/lib/`:
 
 | Module | Purpose |
 |--------|---------|
@@ -18,9 +18,13 @@ The main script (`hooks/ntfy-notify.sh`) is modular — it sources four librarie
 | `terminal.sh` | Cross-platform foreground detection (macOS/Linux/Windows) — skips notifications when terminal is active |
 | `notify.sh` | Sends via ntfy CLI (preferred) or curl fallback; handles custom servers/tokens via temp config files |
 | `template.sh` | Builds notification title/body with variable replacement (`{project_name}`, `{tool_name}`, `{message}`) |
+| `remote-approve.sh` | Remote approval: sends action buttons, subscribes to response topic, outputs `hookSpecificOutput` for Claude Code |
 
 **Key design decisions**:
-- Hooks run `async: true` to avoid blocking Claude Code
+- `PermissionRequest` hook is **synchronous** (`timeout: 300`) to allow remote approval to work; when `NTFY_REMOTE_APPROVE=false`, the hook exits immediately after sending the notification
+- `Stop` hook remains `async: true`
+- Remote approval uses a unique response topic per request (`{topic}-resp-{timestamp}-{pid}`) to avoid collisions between concurrent sessions
+- Action buttons include auth headers (`headers.Authorization=Bearer {token}`) so they can publish to token-protected servers
 - `CLAUDE_PLUGIN_ROOT` variable provides portable paths in `hooks.json`
 - Windows has separate `ntfy-notify.ps1` and `ntfy-notify.cmd` fallback scripts
 - JSON parsing uses Python (both `python3` and `python` are checked)
@@ -40,6 +44,7 @@ Stored at `~/.claude/plugins/claude-notify-plugin/config` (sourced as shell vari
 - `NTFY_HOST` (optional) — custom ntfy server URL (default: `https://ntfy.sh`)
 - `NTFY_TOKEN` (optional) — auth token for self-hosted servers
 - `NTFY_ENABLED` / `NTFY_TERMINAL_CHECK` — feature toggles
+- `NTFY_REMOTE_APPROVE` / `NTFY_REMOTE_TIMEOUT` — remote approval from phone
 - `NTFY_PERMISSION_TITLE`, `NTFY_PERMISSION_BODY`, `NTFY_STOP_TITLE`, `NTFY_STOP_BODY` — custom templates
 
 ## Publishing Workflow

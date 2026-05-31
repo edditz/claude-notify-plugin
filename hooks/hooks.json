@@ -7,7 +7,7 @@
           {
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/ntfy-notify.sh\"",
-            "async": true,
+            "timeout": 300,
             "windows_command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/ntfy-notify.cmd\""
           }
         ]

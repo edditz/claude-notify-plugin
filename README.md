@@ -7,6 +7,7 @@ Push notifications for Claude Code events via ntfy. Get notified on your phone o
 - 🔔 **Permission Alerts** - Get notified when Claude needs your approval
 - ✅ **Task Completion** - Know when Claude finishes working
 - 📱 **Mobile Notifications** - Receive alerts on your phone/watch
+- 👆 **Remote Approval** - Approve or deny permissions directly from your phone
 - 🖥️ **Smart Detection** - Skips notifications when you're watching the terminal
 - 🏠 **Self-Hosted Support** - Use your own ntfy server
 - 🔕 **Easy Toggle** - Enable/disable notifications with one command
@@ -85,7 +86,44 @@ NTFY_HOST=https://ntfy.example.com
 
 # Optional: Authentication token
 NTFY_TOKEN=your-auth-token
+
+# Optional: Remote approval from phone (default: false)
+NTFY_REMOTE_APPROVE=true
+NTFY_REMOTE_TIMEOUT=300  # 5 minute timeout
 ```
+
+## Remote Approval
+
+Approve or deny Claude's permission requests directly from your phone.
+
+When enabled, permission notifications include **Approve** and **Deny** buttons. Tap either button to make your decision remotely — no need to return to the terminal.
+
+### Requirements
+
+- `NTFY_TOKEN` must be configured (required for action button authentication)
+
+### Setup
+
+Enable in config or via `/claude-notify-plugin:config`:
+```ini
+NTFY_REMOTE_APPROVE=true
+NTFY_REMOTE_TIMEOUT=300  # seconds to wait for response
+```
+
+### How It Works
+
+```
+Claude needs approval
+  → Notification with Approve/Deny buttons sent to phone
+  → User taps button → ntfy publishes to response topic
+  → Hook subscribes to response topic, receives decision
+  → Hook outputs decision to stdout
+  → Claude Code auto-approves or auto-denies
+```
+
+- **Approve**: Claude proceeds immediately
+- **Deny**: Claude is denied with reason "Denied by user via remote notification"
+- **Timeout** (no response): Claude Code shows its normal permission UI
 
 ## Self-Hosted Server
 

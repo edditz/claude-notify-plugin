@@ -24,6 +24,7 @@ Show the user their current configuration:
 - 终端检查: 启用/禁用
 - 通知频道: <topic>
 - 服务器: <host>
+- 远程审批: 启用/禁用 (超时: <timeout>s)
 ```
 
 ### Step 3: Ask what to configure
@@ -35,6 +36,7 @@ Ask the user which setting they want to change:
 3. **通知内容** - 自定义通知标题和正文
 4. **通知频道** - 更改通知频道名称
 5. **服务器设置** - 更改 ntfy 服务器地址
+6. **远程审批** - 从手机批准/拒绝 Claude 的权限请求
 
 ### Step 4: Apply changes
 
@@ -67,6 +69,71 @@ else
         echo "NTFY_TERMINAL_CHECK=false" >> ~/.claude/plugins/claude-notify-plugin/config
     fi
     echo "✅ 终端检查已禁用（始终发送通知）"
+fi
+```
+
+**For 远程审批 (NTFY_REMOTE_APPROVE):**
+
+Show current state:
+```
+当前状态: 启用/禁用
+超时时间: 300s
+认证令牌: 已配置/未配置
+
+远程审批允许你在手机上通过通知按钮批准或拒绝 Claude 的权限请求。
+Remote approval lets you approve/deny Claude permission requests via notification buttons on your phone.
+
+请选择:
+1. 启用远程审批
+2. 禁用远程审批
+3. 更改超时时间
+```
+
+**For enabling:**
+```bash
+# Check token exists
+if ! grep -q "NTFY_TOKEN=" ~/.claude/plugins/claude-notify-plugin/config || grep -q "NTFY_TOKEN=$" ~/.claude/plugins/claude-notify-plugin/config; then
+    echo "⚠️ 远程审批需要认证令牌 (NTFY_TOKEN)。请先在服务器设置中配置令牌。"
+    echo "Remote approval requires an auth token. Please configure the token in server settings first."
+else
+    if grep -q "NTFY_REMOTE_APPROVE=" ~/.claude/plugins/claude-notify-plugin/config; then
+        sed -i '' 's/NTFY_REMOTE_APPROVE=.*/NTFY_REMOTE_APPROVE=true/' ~/.claude/plugins/claude-notify-plugin/config
+    else
+        echo "NTFY_REMOTE_APPROVE=true" >> ~/.claude/plugins/claude-notify-plugin/config
+    fi
+    echo "✅ 远程审批已启用"
+    echo ""
+    echo "行为:"
+    echo "- Claude 需要审批时，你会收到带有「Approve/Deny」按钮的通知"
+    echo "- 点击按钮即可远程决策，无需回到终端"
+    echo "- 如果超时未响应，Claude Code 会显示正常的审批界面"
+fi
+```
+
+**For disabling:**
+```bash
+if grep -q "NTFY_REMOTE_APPROVE=" ~/.claude/plugins/claude-notify-plugin/config; then
+    sed -i '' 's/NTFY_REMOTE_APPROVE=.*/NTFY_REMOTE_APPROVE=false/' ~/.claude/plugins/claude-notify-plugin/config
+else
+    echo "NTFY_REMOTE_APPROVE=false" >> ~/.claude/plugins/claude-notify-plugin/config
+fi
+echo "✅ 远程审批已禁用"
+```
+
+**For changing timeout:**
+```bash
+echo "当前超时: $(grep NTFY_REMOTE_TIMEOUT ~/.claude/plugins/claude-notify-plugin/config 2>/dev/null | cut -d= -f2 || echo 300)s"
+echo "请输入新的超时时间（秒）:"
+read new_timeout
+if [[ "$new_timeout" =~ ^[0-9]+$ ]]; then
+    if grep -q "NTFY_REMOTE_TIMEOUT=" ~/.claude/plugins/claude-notify-plugin/config; then
+        sed -i '' "s/NTFY_REMOTE_TIMEOUT=.*/NTFY_REMOTE_TIMEOUT=$new_timeout/" ~/.claude/plugins/claude-notify-plugin/config
+    else
+        echo "NTFY_REMOTE_TIMEOUT=$new_timeout" >> ~/.claude/plugins/claude-notify-plugin/config
+    fi
+    echo "✅ 超时时间已更新为 ${new_timeout}s"
+else
+    echo "❌ 无效输入，请输入数字"
 fi
 ```
 

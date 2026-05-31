@@ -57,3 +57,22 @@ check_notification_method() {
 # Export Python command for use in other modules
 export PYTHON_CMD
 PYTHON_CMD=$(get_python_command)
+
+# Validate remote approval configuration
+validate_remote_approve_config() {
+    if [ "${NTFY_REMOTE_APPROVE:-false}" = "true" ]; then
+        # Remote approval requires token for action button auth on self-hosted servers
+        if [ -z "${NTFY_TOKEN:-}" ]; then
+            log_debug "Remote approval enabled but no NTFY_TOKEN — action buttons may fail on auth-required servers"
+        fi
+        # Validate timeout is a positive integer
+        if [ -n "${NTFY_REMOTE_TIMEOUT:-}" ]; then
+            if ! [[ "${NTFY_REMOTE_TIMEOUT}" =~ ^[0-9]+$ ]]; then
+                log_debug "Invalid NTFY_REMOTE_TIMEOUT: ${NTFY_REMOTE_TIMEOUT}, using default 300"
+                export NTFY_REMOTE_TIMEOUT=300
+            fi
+        else
+            export NTFY_REMOTE_TIMEOUT=300
+        fi
+    fi
+}
