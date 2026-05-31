@@ -13,16 +13,22 @@ Push notifications for Claude Code events via ntfy. Get notified on your phone o
 
 ## Quick Start
 
-### 1. Install the Plugin
+### 1. Add Marketplace
 
 ```bash
-claude plugin install claude-notify-plugin
+claude plugin marketplace add git@github.com:edditz/claude-plugins-marketplace.git
 ```
 
-### 2. Run Setup
+### 2. Install the Plugin
+
+```bash
+claude plugin install claude-notify-plugin@edditz-plugins
+```
+
+### 3. Run Setup
 
 ```
-/notify:setup
+/claude-notify-plugin:setup
 ```
 
 This will guide you through:
@@ -156,9 +162,9 @@ The plugin detects if these terminals are in the foreground:
 
 ## Commands
 
-- `/notify:setup` - Interactive setup wizard
-- `/notify:toggle` - Toggle notifications on/off
-- `/notify:config` - Configure notification settings
+- `/claude-notify-plugin:setup` - Interactive setup wizard
+- `/claude-notify-plugin:toggle` - Toggle notifications on/off
+- `/claude-notify-plugin:config` - Configure notification settings
 
 ## Dependencies
 
@@ -214,3 +220,4 @@ MIT
 
 - [ntfy Documentation](https://docs.ntfy.sh/)
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
+- [Marketplace](https://github.com/edditz/claude-plugins-marketplace)
