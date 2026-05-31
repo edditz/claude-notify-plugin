@@ -13,8 +13,9 @@ replace_variables() {
     local project_name
     project_name=$(get_project_name)
 
-    # Replace {project_name} with actual project name
-    echo "${template//\{project_name\}/$project_name}"
+    # Use variable to avoid } ambiguity in ${...//pattern/}
+    local pattern='{project_name}'
+    echo "${template//$pattern/$project_name}"
 }
 
 # Build notification for PermissionRequest event
@@ -27,7 +28,8 @@ build_permission_notification() {
 
     # Get title and body templates (with defaults)
     local title_template="${NTFY_PERMISSION_TITLE:-Claude 需要审批}"
-    local body_template="${NTFY_PERMISSION_BODY:-{tool_name}}"
+    local default_body='{tool_name}'
+    local body_template="${NTFY_PERMISSION_BODY:-$default_body}"
 
     # Replace variables
     local title
@@ -35,8 +37,9 @@ build_permission_notification() {
     local body
     body=$(replace_variables "$body_template")
 
-    # Replace {tool_name} with actual tool name
-    body="${body//\{tool_name\}/$tool_name}"
+    # Use variable to avoid } ambiguity in ${...//pattern/}
+    local pattern='{tool_name}'
+    body="${body//$pattern/$tool_name}"
 
     # Output: title|body|priority|tags
     echo "${title}|${body}|4|bell"
@@ -57,7 +60,8 @@ print(msg[:100]) if msg else print('')
 
     # Get title and body templates (with defaults)
     local title_template="${NTFY_STOP_TITLE:-Claude 已停止}"
-    local body_template="${NTFY_STOP_BODY:-{message}}"
+    local default_body='{message}'
+    local body_template="${NTFY_STOP_BODY:-$default_body}"
 
     # Replace variables
     local title
@@ -65,8 +69,9 @@ print(msg[:100]) if msg else print('')
     local body
     body=$(replace_variables "$body_template")
 
-    # Replace {message} with actual message
-    body="${body//\{message\}/$message}"
+    # Use variable to avoid } ambiguity in ${...//pattern/}
+    local pattern='{message}'
+    body="${body//$pattern/$message}"
 
     # Output: title|body|priority|tags
     echo "${title}|${body}|3|check"
