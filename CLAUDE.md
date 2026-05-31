@@ -59,10 +59,16 @@ After pushing this plugin to its remote repository, you MUST also sync the marke
 
 The marketplace uses the SHA to pin which commit of this plugin users install.
 
+## Local Development Workflow
+
+Do NOT use symlinks — they get wiped on plugin reload. Use the standard publish + update flow:
+
+1. **Quick test** (no install needed): `echo '{"hook_event_name":"Stop","last_assistant_message":"test"}' | bash hooks/ntfy-notify.sh`
+2. **Full install test**: push code → update marketplace SHA → `claude plugin update claude-notify-plugin@edditz-plugins` → `/reload-plugins`
+3. Debug logs: `/tmp/claude-notify-debug.log`
+
 ## Development Notes
 
 - There is no build step, test suite, or package manager — this is a pure shell plugin
-- To test manually: `echo '{"hook_event_name":"Stop","last_assistant_message":"test"}' | bash hooks/ntfy-notify.sh`
-- Debug logs are written to `/tmp/claude-notify-debug.log`
 - The handoff document (`claude-notify-handoff.md`) contains historical design context in Chinese
 - Notification priorities: PermissionRequest=4 (high), Stop=3 (default)
